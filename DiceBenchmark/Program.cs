@@ -207,37 +207,38 @@ public class Application
         string? input = "";
         
         Console.WriteLine("\nDefine dice (tw, bw, mw, sw) and the number of rolls:");
+        Console.WriteLine(tw + " Tw, " + bw + " Bw, " + mw + " Mw, " + sw + " Sw, " + roll + " Rolls");
 
         input = "";
-        while (!int.TryParse(input, out tw) && tw != -1)
+        while (tw <= 0 && !int.TryParse(input, out tw))
         {
             Console.Write("Tw: ");
             input = Console.ReadLine();
         }
 
-        input = "";
-        while (!int.TryParse(input, out bw) && bw != -1)
+        input = "x";
+        while (bw <= 0 && !int.TryParse(input, out bw))
         {
             Console.Write("Bw: ");
             input = Console.ReadLine();
         }
 
-        input = "";
-        while (!int.TryParse(input, out mw) && mw != -1)
+        input = "x";
+        while (mw <= 0 && !int.TryParse(input, out mw))
         {
             Console.Write("Mw: ");
             input = Console.ReadLine();
         }
 
-        input = "";
-        while (!int.TryParse(input, out sw) && sw != -1)
+        input = "x";
+        while (sw <= 0 && !int.TryParse(input, out sw))
         {
             Console.Write("Sw: ");
             input = Console.ReadLine();
         }
 
         input = "";
-        while (!int.TryParse(input, out roll) && roll != -1)
+        while (roll <= 0 && !int.TryParse(input, out roll))
         {
             Console.Write("Roll: ");
             input = Console.ReadLine();
