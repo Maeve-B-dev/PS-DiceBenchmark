@@ -143,17 +143,42 @@ public class Application
 
         while (!exitProgramm)
         {
-            // Outputs info if args were used.
-            if (arguments.tw != -1 || arguments.bw != -1 || arguments.mw != -1 || arguments.sw != -1 || arguments.rolls != -1)
+            bool argsUsed    = false;
+            // Set diceParametersMain values to args if they were set, otherwise keep default values.
+            if (arguments.tw != -1)
             {
-                Console.WriteLine("Using command line arguments for dice parameters.");
+                diceParametersMain.tw = arguments.tw;
+                argsUsed = true;
+            }
+            if (arguments.bw != -1)
+            {
+                diceParametersMain.bw = arguments.bw;
+                argsUsed = true;
+            }
+            if (arguments.mw != -1)
+            {
+                diceParametersMain.mw = arguments.mw;
+                argsUsed = true;
+            }
+            if (arguments.sw != -1)
+            {
+                diceParametersMain.sw = arguments.sw;
+                argsUsed = true;
+            }
+            if (arguments.rolls != -1)
+            {
+                diceParametersMain.roll = arguments.rolls;
+                argsUsed = true;
+            }
+            if(argsUsed)
+            {
+                Console.WriteLine("Command line arguments used, using these values:\nTw: " + diceParametersMain.tw + "\nBw: " + diceParametersMain.bw + "\nMw: " + diceParametersMain.mw + "\nSw: " + diceParametersMain.sw + "\nRolls: " + diceParametersMain.roll);
             }
             // If all args were used, enable full automatic mode for integration.
             if (arguments.tw != -1 && arguments.bw != -1 && arguments.mw != -1 && arguments.sw != -1 && arguments.rolls != -1)
             {
                 fullAutomatic = true;
                 Console.Clear();
-                diceParametersMain = new diceParameter(arguments.tw, arguments.bw, arguments.mw, arguments.sw, arguments.rolls);
             }
             // Ask to define Parameters
             if (!fullAutomatic)
@@ -174,6 +199,11 @@ public class Application
             if (verbose)
             {
                 Console.WriteLine(ProcessTextResults(result));
+                if(!fullAutomatic)
+                {
+                    Console.WriteLine("Dice Parameters used:");
+                    Console.WriteLine(diceParametersMain.tw + " Tw, " + diceParametersMain.bw + " Bw, " + diceParametersMain.mw + " Mw, " + diceParametersMain.sw + " Sw, " + diceParametersMain.roll + " Rolls");
+                }
             }
             
             if(fullAutomatic)
@@ -207,7 +237,6 @@ public class Application
         string? input = "";
         
         Console.WriteLine("\nDefine dice (tw, bw, mw, sw) and the number of rolls:");
-        Console.WriteLine(tw + " Tw, " + bw + " Bw, " + mw + " Mw, " + sw + " Sw, " + roll + " Rolls");
 
         input = "";
         while (tw <= 0 && !int.TryParse(input, out tw))
