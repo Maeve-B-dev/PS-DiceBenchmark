@@ -163,7 +163,7 @@ public class Application
 
                 if (defineDice)
                 {
-                    GetUserDiceParameters(arguments.tw, arguments.bw, arguments.mw, arguments.sw, arguments.rolls);
+                    diceParametersMain = GetUserDiceParameters(arguments.tw, arguments.bw, arguments.mw, arguments.sw, arguments.rolls);
                 }
             }
 
@@ -205,40 +205,39 @@ public class Application
     static diceParameter GetUserDiceParameters(int tw = -1, int bw = -1, int mw = -1, int sw = -1, int roll = -1)
     {
         string? input = "";
-        diceParameter diceParameters = new diceParameter();
+        
         Console.WriteLine("\nDefine dice (tw, bw, mw, sw) and the number of rolls:");
 
         input = "";
-        while (!int.TryParse(input, out diceParameters.tw) && tw == -1)
+        while (!int.TryParse(input, out tw) && tw != -1)
         {
             Console.Write("Tw: ");
             input = Console.ReadLine();
         }
 
         input = "";
-        while (!int.TryParse(input, out diceParameters.bw) && bw == -1)
+        while (!int.TryParse(input, out bw) && bw != -1)
         {
             Console.Write("Bw: ");
             input = Console.ReadLine();
         }
 
         input = "";
-        while (!int.TryParse(input, out diceParameters.mw) && mw == -1)
+        while (!int.TryParse(input, out mw) && mw != -1)
         {
             Console.Write("Mw: ");
             input = Console.ReadLine();
         }
 
         input = "";
-        while (!int.TryParse(input, out diceParameters.sw) && sw == -1)
+        while (!int.TryParse(input, out sw) && sw != -1)
         {
             Console.Write("Sw: ");
             input = Console.ReadLine();
         }
 
-        Console.Write("Roll: ");
         input = "";
-        while (!int.TryParse(input, out diceParameters.roll) && roll == -1)
+        while (!int.TryParse(input, out roll) && roll != -1)
         {
             Console.Write("Roll: ");
             input = Console.ReadLine();
@@ -246,23 +245,31 @@ public class Application
         Console.WriteLine("Do you want the program to run verbosely? (y/N)");
         verbose = Console.ReadKey().KeyChar.CompareTo('y') == 0;
 
+        diceParameter diceParameters = new diceParameter(tw, bw, mw, sw, roll);
+
         return diceParameters;
     }
     // Runs main Benchmark with given diceParameters and returns a diceResult struct with all results combined.
     static diceResult RunBenchmark(diceParameter diceParameters, bool writeRolls)
     {
         diceResult resultsCombined = new diceResult(0, 0, 0, 0, 0, 0, 0, 0, 0);
+        int diceNumTw = (int)Math.Round((double)(diceParameters.tw / 2));
+        int diceNumSw = (int)Math.Round((double)(diceParameters.sw / 2));
+
+        Random randGen = new Random();
+        
+
         for (int i = 0; i < diceParameters.roll; i++)
         {
             // Run rolls for each dice type and combine results
-            diceResult rollResult = new diceResult(0, 0, 0, 0, 0, 0, 0, 0, 0);
-            diceResult rollResultTW = RunRoll("tw", diceParameters.tw);
+            diceResult rollResult = new diceResult();
+            diceResult rollResultTW = RunRoll("tw", diceParameters.tw, randGen);
             rollResult = AddDiceResults(rollResult, rollResultTW);
-            diceResult rollResultBW = RunRoll("bw", diceParameters.bw);
+            diceResult rollResultBW = RunRoll("bw", diceParameters.bw, randGen);
             rollResult = AddDiceResults(rollResult, rollResultBW);
-            diceResult rollResultMW = RunRoll("mw", diceParameters.mw);
+            diceResult rollResultMW = RunRoll("mw", diceParameters.mw, randGen);
             rollResult = AddDiceResults(rollResult, rollResultMW);
-            diceResult rollResultSW = RunRoll("sw", diceParameters.sw);
+            diceResult rollResultSW = RunRoll("sw", diceParameters.sw, randGen);
             rollResult = AddDiceResults(rollResult, rollResultSW);
 
             // Outputs each roll individually, if the user wishes.
@@ -279,10 +286,10 @@ public class Application
             }
 
             //Process the Result and add it to combined results
-            if (rollResult.critSuccesses >= Math.Round((double)diceParameters.tw/2) && succ > 0 && diceParameters.tw > 0)
+            if (rollResult.critSuccesses >= diceNumTw && succ > 0 && diceParameters.tw > 0)
             {
                 resultsCombined.criticalSuccessfullRolls++;
-            }else if(rollResult.critFailures >= Math.Round((double)diceParameters.sw / 2) && succ < 0 && diceParameters.sw > 0)
+            }else if(rollResult.critFailures >= diceNumSw && succ < 0 && diceParameters.sw > 0)
             {
                 resultsCombined.criticalFailureRolls++;
             }
@@ -291,90 +298,124 @@ public class Application
         return resultsCombined;
     }
     //Runs a defined amount of rolls for a given dice type and returns a diceResult struct with the results.
-    static diceResult RunRoll(string dice, int count)
+    static diceResult RunRoll(string dice, int count, Random randGen)
     {
         diceResult result = new diceResult(0,0,0,0,0,0,0,0,0);
 
-        for (int i = 0; i < count; i++)
+        int[] randomNums = new int[count];
+        for(int i = 0; i < count; i++)
         {
-            int roll = new Random().Next(1, 7);
-            switch ((roll, dice))
-            {
-                case (1, "tw"):
-                    result.failures++;
-                    break;
-                case (2, "tw"):
-                    result.successes++;
-                    break;
-                case (3, "tw"):
-                    result.successes++;
-                    break;
-                case (4, "tw"):
-                    result.successes++;
-                    break;
-                case (5, "tw"):
-                    result.successes++;
-                    break;
-                case (6, "tw"):
-                    result.critSuccesses++;
-                    result.successes += 2;
-                    break;
+            randomNums[i] = randGen.Next(1, 7);
+        }
 
-                case (1, "bw"): break;
-                case (2, "bw"): break;
-                case (3, "bw"):
-                    result.successes++;
-                    break;
-                case (4, "bw"):
-                    result.successes++;
-                    break;
-                case (5, "bw"):
-                    result.successes++;
-                    break;
-                case (6, "bw"):
-                    result.successes++;
-                    break;
-
-                case (1, "mw"):
-                    result.failures++;
-                    break;
-                case (2, "mw"):
-                    result.failures++;
-                    break;
-                case (3, "mw"):
-                    result.failures++;
-                    break;
-                case (4, "mw"):
-                    result.failures++;
-                    break;
-                case (5, "mw"): break;
-                case (6, "mw"): break;
-
-                case (1, "sw"):
-                    result.failures += 2;
-                    result.critFailures++;
-                    break;
-                case (2, "sw"):
-                    result.failures++;
-                    break;
-                case (3, "sw"):
-                    result.failures++;
-                    break;
-                case (4, "sw"):
-                    result.failures++;
-                    break;
-                case (5, "sw"):
-                    result.failures++;
-                    break;
-                case (6, "sw"):
-                    AddDiceResults(result, RunRoll("bw", 1));
-                    break;
-
-                default:
-                    Console.WriteLine("Dice Result out of Range or Dice not recognized: " + roll + " for dice type: " + dice);
-                    Environment.Exit(1);
-                    break;
-            }
+        switch(dice)
+        {
+            case "tw":
+                for (int i = 0; i < count; i++)
+                {
+                    int roll = randomNums[i];
+                    switch (roll)
+                    {
+                        case 1:
+                            result.failures++;
+                            break;
+                        case 2:
+                            result.successes++;
+                            break;
+                        case 3:
+                            result.successes++;
+                            break;
+                        case 4:
+                            result.successes++;
+                            break;
+                        case 5:
+                            result.successes++;
+                            break;
+                        case 6:
+                            result.critSuccesses++;
+                            result.successes += 2;
+                            break;
+                    }
+                }
+                break;
+            case "bw":
+                for (int i = 0; i < count; i++)
+                {
+                    int roll = randomNums[i];
+                    switch(roll)
+                    {
+                        case 1: break;
+                        case 2: break;
+                        case 3:
+                            result.successes++;
+                            break;
+                        case 4:
+                            result.successes++;
+                            break;
+                        case 5:
+                            result.successes++;
+                            break;
+                        case 6:
+                            result.successes++;
+                            break;
+                    }
+                }
+                break;
+            case "mw":
+                for (int i = 0; i < count; i++)
+                {
+                    int roll = randomNums[i];
+                    switch (roll)
+                    {
+                        case 1:
+                            result.failures++;
+                            break;
+                        case 2:
+                            result.failures++;
+                            break;
+                        case 3:
+                            result.failures++;
+                            break;
+                        case 4:
+                            result.failures++;
+                            break;
+                        case 5: break;
+                        case 6: break;
+                    }
+                }
+                break;
+            case "sw":
+                for (int i = 0; i < count; i++)
+                {
+                    int roll = randomNums[i];
+                    switch (roll)
+                    {
+                        case 1:
+                            result.failures += 2;
+                            result.critFailures++;
+                            break;
+                        case 2:
+                            result.failures++;
+                            break;
+                        case 3:
+                            result.failures++;
+                            break;
+                        case 4:
+                            result.failures++;
+                            break;
+                        case 5:
+                            result.failures++;
+                            break;
+                        case 6:
+                            AddDiceResults(result, RunRoll("bw", 1, randGen));
+                            break;
+                    }
+                }
+                break;
+            default:
+                Console.WriteLine("Dice not recognized: " + dice);
+                Environment.Exit(1);
+                break;
         }
 
         return result;
