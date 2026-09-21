@@ -1,5 +1,5 @@
 # Lex Magia - DiceBenchmark
-This is a small command-line tool, designed to benchmark and balance Lex Magias dice system.
+This is a small command-line tool, designed to benchmark and balance Lex Magias dice system. It's an updated version of DiceBenchmark, originally published on rpg.bollmann-hb.de, which includes better performance and cleaner code.
 
 ## Installation
 Go to [Releases](https://github.com/Maeve-B-dev/PS-DiceBenchmark/releases) and download the latest version.
